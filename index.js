@@ -512,66 +512,65 @@ function updateRow() {
  */
 // function search(tableName, field, keyword, callback) {
 function search() {
+	let tableName = arguments[0];
+	var fname = '';
+	var field;
+	var keyword;
+	var callback;
 
-    let tableName = arguments[0];
-    var fname = '';
-    var field;
-    var keyword;
-    var callback;
+	if (arguments.length === 4) {
+		fname = path.join(userData, tableName + '.json');
+		field = arguments[1];
+		keyword = arguments[2];
+		callback = arguments[3];
+	} else if (arguments.length === 5) {
+		fname = path.join(arguments[1], arguments[0] + '.json');
+		field = arguments[2];
+		keyword = arguments[3];
+		callback = arguments[4];
+	}
 
-    if (arguments.length === 4) {
-        fname = path.join(userData, tableName + '.json');
-        field = arguments[1];
-        keyword = arguments[2];
-        callback = arguments[3];
-    } else if (arguments.length === 5) {
-        fname = path.join(arguments[1], arguments[0] + '.json');
-        field = arguments[2];
-        keyword = arguments[3];
-        callback = arguments[4];
-    }
+	let exists = fs.existsSync(fname);
 
-    let exists = fs.existsSync(fname);
+	if (exists) {
+		let table = JSON.parse(fs.readFileSync(fname));
+		let rows = table[tableName];
 
-    if (exists) {
-        let table = JSON.parse(fs.readFileSync(fname));
-        let rows = table[tableName];
+		if (rows.length > 0) {
+			// Declare an empty list
+			let foundRows = [];
 
-        if (rows.length > 0) {
+			for (var i = 0; i < rows.length; i++) {
+				// Check if key exists
+				if (rows[i].hasOwnProperty(field)) {
+					// Make sure that an object is converted to string before
+					// applying toLowerCase()
+					let value = rows[i][field].toString().toLowerCase();
+					let n = value.search(keyword.toString().toLowerCase());
 
-            // Declare an empty list
-            let foundRows = [];
-
-            for (var i = 0; i < rows.length; i++) {
-                // Check if key exists
-                if (rows[i].hasOwnProperty(field)) {
-                    // Make sure that an object is converted to string before
-                    // applying toLowerCase()
-                    let value = rows[i][field].toString().toLowerCase();
-                    let n = value.search(keyword.toString().toLowerCase());
-
-                    if (n !== -1) {
-                        // The substring is found, add object to the list.
-                        foundRows.push(rows[i]);
-                    }
-
-                } else {
-                    callback(false, 2);
-                    return;
-                }
-            }
-
-            callback(true, foundRows);
-            return;
-
-        } else {
-            callback(false, []);
-            return;
-        }
-    } else {
-        callback(false, 'Table file does not exist!');
-        return;
-    }
+					if (n !== -1) {
+						// The substring is found, add object to the list.
+						foundRows.push(rows[i]);
+					}
+					if (i === rows.length - 1) {
+						if (foundRows.length === 0) {
+							callback(false, []);
+							return;
+						} else {
+							callback(true, foundRows);
+							return;
+						}
+					}
+				}
+			}
+		} else {
+			callback(false, []);
+			return;
+		}
+	} else {
+		callback(false, 'Table file does not exist!');
+		return;
+	}
 }
 
 /**
