@@ -1,3 +1,5 @@
+This is some dudes electron db module that I made a very small edit to so that the search function would work 
+https://github.com/alexiusacademia/electron-db
 # electron-db
 ---
 [![Build Status](https://travis-ci.org/alexiusacademia/electron-db.svg?branch=master)](https://travis-ci.org/alexiusacademia/electron-db)
